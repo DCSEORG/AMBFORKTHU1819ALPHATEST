@@ -1,0 +1,70 @@
+@page
+@model ExpenseManagement.Pages.NewExpenseModel
+@{
+    ViewData["Title"] = "New Expense";
+}
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="error-banner">
+        <h6>⚠️ Error</h6>
+        <p class="mb-0">@Model.ErrorMessage</p>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="alert alert-success">
+        <p class="mb-0">@Model.SuccessMessage</p>
+    </div>
+}
+
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-body">
+        <h4 class="mb-4 fw-semibold">Add New Expense</h4>
+        
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Amount (£)</label>
+                <input type="number" step="0.01" min="0.01" class="form-control" name="Amount" value="@Model.Amount" required>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-control" name="ExpenseDate" value="@Model.ExpenseDate?.ToString("yyyy-MM-dd")" required>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Category</label>
+                <select class="form-select" name="CategoryId" required>
+                    <option value="">Select Category</option>
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <option value="@cat.CategoryId" selected="@(Model.CategoryId == cat.CategoryId)">@cat.CategoryName</option>
+                    }
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">User</label>
+                <select class="form-select" name="UserId" required>
+                    <option value="">Select User</option>
+                    @foreach (var user in Model.Users)
+                    {
+                        <option value="@user.UserId" selected="@(Model.UserId == user.UserId)">@user.UserName</option>
+                    }
+                </select>
+            </div>
+            
+            <div class="mb-4">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" name="Description" rows="3" placeholder="Enter expense description...">@Model.Description</textarea>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Submit Expense</button>
+                <a asp-page="/Expenses" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
