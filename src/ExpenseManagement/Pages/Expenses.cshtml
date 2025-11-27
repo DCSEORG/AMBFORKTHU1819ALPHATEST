@@ -1,0 +1,110 @@
+@page
+@model ExpenseManagement.Pages.ExpensesModel
+@{
+    ViewData["Title"] = "Expenses";
+}
+
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="error-banner">
+        <h6>⚠️ Database Connection Issue</h6>
+        <p class="mb-0">@Model.ErrorMessage</p>
+        <small class="text-muted">Displaying sample data. Please check your database connection.</small>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0 fw-semibold">All Expenses</h4>
+            <a asp-page="/NewExpense" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="me-1">
+                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                </svg>
+                New Expense
+            </a>
+        </div>
+        
+        <!-- Filters -->
+        <form method="get" class="row g-3 mb-4">
+            <div class="col-md-3">
+                <label class="form-label">Search</label>
+                <input type="text" class="form-control" name="search" value="@Model.SearchTerm" placeholder="Search description...">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Category</label>
+                <select class="form-select" name="category">
+                    <option value="">All Categories</option>
+                    @foreach (var cat in Model.Categories)
+                    {
+                        <option value="@cat.CategoryId" selected="@(Model.SelectedCategory == cat.CategoryId)">@cat.CategoryName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Status</label>
+                <select class="form-select" name="status">
+                    <option value="">All Statuses</option>
+                    @foreach (var status in Model.Statuses)
+                    {
+                        <option value="@status.StatusId" selected="@(Model.SelectedStatus == status.StatusId)">@status.StatusName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <button type="submit" class="btn btn-outline-primary d-block w-100">Filter</button>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <a asp-page="/Expenses" class="btn btn-outline-secondary d-block w-100">Clear</a>
+            </div>
+        </form>
+        
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Employee</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var expense in Model.Expenses)
+                    {
+                        <tr>
+                            <td>@expense.ExpenseDate.ToString("dd MMM yyyy")</td>
+                            <td>@expense.UserName</td>
+                            <td>@expense.CategoryName</td>
+                            <td>£@expense.AmountGBP.ToString("N2")</td>
+                            <td>
+                                <span class="status-badge status-@expense.StatusName.ToLower()">
+                                    @expense.StatusName.ToUpper()
+                                </span>
+                            </td>
+                            <td>@expense.Description</td>
+                            <td>
+                                @if (expense.StatusName == "Draft")
+                                {
+                                    <form method="post" asp-page-handler="Submit" style="display: inline;">
+                                        <input type="hidden" name="expenseId" value="@expense.ExpenseId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">Submit</button>
+                                    </form>
+                                    <form method="post" asp-page-handler="Delete" style="display: inline;">
+                                        <input type="hidden" name="expenseId" value="@expense.ExpenseId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
